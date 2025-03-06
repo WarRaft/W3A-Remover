@@ -14,7 +14,7 @@ ts-node convert.ts <input>.json [output].w3a
 ts-node remover.ts <input>.json <rawcodes> [output].json
 ```
 
-### Example of <rawcodes> file
+### Example of "rawcodes" file
 ```
 A001
 A003
