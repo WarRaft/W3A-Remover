@@ -1,7 +1,7 @@
 # How to use
 ## To convert .w3a to .json
 ```bash
-ts-node convert.ts <input>.w3a [output.json
+ts-node convert.ts <input>.w3a [output].json
 ```
 
 ## To convert .json to .w3a
