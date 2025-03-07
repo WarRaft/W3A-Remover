@@ -1,7 +1,11 @@
 {
 	"name": "w3a-remover",
 	"version": "1.0.0",
-	"description": "w3a-remover by KaneThaumaturge",
+	"description": "The tool allows you to convert .w3a files to .json and vice versa, as well as remove specific ability data from .json files based on various filters.",
+	"author": {
+		"name": "Illia Korzhov",
+		"email": "illia.korzhov.ua@gmail.com"
+	},
 	"main": "remover.js",
 	"scripts": {
 		"convert": "ts-node convert.ts",
