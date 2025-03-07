@@ -4,7 +4,7 @@ import * as fs from "fs";
 import { hideBin } from "yargs/helpers";
 import yargs from "yargs";
 import { metaDataDict } from "./src/meta-data-dict";
-import { SLK } from "./src/slk/slk";
+import { SLK } from "./src/slk";
 
 interface AbilityField {
 	id?: string;
