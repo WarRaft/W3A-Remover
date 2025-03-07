@@ -3,6 +3,7 @@
 import * as fs from "fs";
 import { hideBin } from "yargs/helpers";
 import yargs from "yargs";
+import { metaDataDict } from "./meta-data-dict";
 
 interface AbilityField {
 	id?: string;
@@ -20,7 +21,7 @@ interface InputData {
 
 const argv = yargs(hideBin(process.argv))
 	.usage(
-		"Usage: npm run remove <input_json> <output_json> [--rawcodes <rawcode_list>] [--id x] [--type x] [--level x] [--column x] [--value x]"
+		"Usage: npm run remove <input_json> <output_json> [--rawcodes <rawcode_list>] [--id x] [--value x] [--lookup-parent]"
 	)
 	.option("rawcodes", {
 		type: "string",
@@ -30,21 +31,13 @@ const argv = yargs(hideBin(process.argv))
 		type: "string",
 		description: "Filter by id",
 	})
-	.option("type", {
-		type: "string",
-		description: "Filter by type",
-	})
-	.option("level", {
-		type: "number",
-		description: "Filter by level",
-	})
-	.option("column", {
-		type: "number",
-		description: "Filter by column",
-	})
 	.option("value", {
 		type: "string",
 		description: "Filter by value",
+	})
+	.option("lookup-parent", {
+		type: "boolean",
+		description: "Lookup parent ability if filters do not match",
 	})
 	.demandCommand(2, "Input and output files are required")
 	.help().argv;
@@ -56,13 +49,21 @@ if (argv._.length > 2) {
 	process.exit(1);
 }
 
-let inputData: InputData;
-try {
-	inputData = JSON.parse(fs.readFileSync(inputPath, "utf8"));
-} catch (error) {
-	console.error(`Error reading or parsing file ${inputPath}:`, error);
+if (argv.id && !metaDataDict[argv.id]) {
+	console.error(`Error: id "${argv.id}" does not match any available metadata`);
 	process.exit(1);
 }
+
+const readJsonFile = (path: string) => {
+	try {
+		return JSON.parse(fs.readFileSync(path, "utf8"));
+	} catch (error) {
+		console.error(`Error reading or parsing file ${path}:`, error);
+		process.exit(1);
+	}
+};
+
+const inputData: InputData = readJsonFile(inputPath);
 
 if (!inputData.custom || typeof inputData.custom !== "object") {
 	console.error(
@@ -73,16 +74,11 @@ if (!inputData.custom || typeof inputData.custom !== "object") {
 
 let rawCodes: string[] = [];
 if (argv.rawcodes) {
-	try {
-		rawCodes = fs
-			.readFileSync(argv.rawcodes, "utf8")
-			.split("\n")
-			.map((code) => code.trim())
-			.filter(Boolean);
-	} catch (error) {
-		console.error(`Error reading rawcodes file ${argv.rawcodes}:`, error);
-		process.exit(1);
-	}
+	rawCodes = fs
+		.readFileSync(argv.rawcodes, "utf8")
+		.split("\n")
+		.map((code) => code.trim())
+		.filter(Boolean);
 
 	const foundCodes: Record<string, boolean> = {};
 	rawCodes.forEach((code) => {
@@ -106,14 +102,20 @@ if (argv.rawcodes) {
 	});
 }
 
+let abilityParentData: any[] = [];
+if (argv["lookup-parent"]) {
+	abilityParentData = readJsonFile("./ability-data.json");
+}
+
 const matchesFilters = (item: AbilityField): boolean => {
 	return (
 		(!argv.id || item.id === argv.id) &&
-		(!argv.type || item.type === argv.type) &&
-		(argv.level === undefined || item.level === argv.level) &&
-		(argv.column === undefined || item.column === argv.column) &&
 		(!argv.value || String(item.value) === argv.value)
 	);
+};
+
+const matchesParentFilters = (parentItem: any, parentMetaId: string): boolean => {
+	return (!argv.value && parentItem[parentMetaId] === argv.value);
 };
 
 const totalElements = Object.keys(inputData.custom).length;
@@ -123,7 +125,18 @@ const newCustom = Object.entries(inputData.custom).reduce(
 		const rawCodeMatch = argv.rawcodes
 			? rawCodes.some((code) => key.startsWith(code))
 			: true;
-		const filterMatch = items.some((item) => matchesFilters(item));
+		let filterMatch = items.some((item) => matchesFilters(item));
+
+		if (!filterMatch && argv["lookup-parent"]) {
+			const parentKey = key.slice(-4);
+			const parentMetaId = metaDataDict[argv.id];
+
+			const parentItems = abilityParentData.filter(
+				(parentItem) => parentItem.code === parentKey
+			);
+			
+			filterMatch = parentItems.some((item) => matchesParentFilters(item, parentMetaId));
+		}
 
 		if (!(rawCodeMatch && filterMatch)) {
 			acc[key] = items;
