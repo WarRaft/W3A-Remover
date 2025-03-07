@@ -4,6 +4,7 @@ import * as fs from "fs";
 import { hideBin } from "yargs/helpers";
 import yargs from "yargs";
 import { metaDataDict } from "./meta-data-dict";
+import * as XLSX from "xlsx";
 
 interface AbilityField {
 	id?: string;
@@ -104,7 +105,8 @@ if (argv.rawcodes) {
 
 let abilityParentData: any[] = [];
 if (argv["lookup-parent"]) {
-	abilityParentData = readJsonFile("./ability-data.json");
+	const slk = XLSX.readFile("./ability-data.slk");
+	abilityParentData = XLSX.utils.sheet_to_json(slk.Sheets[slk.SheetNames[0]]);
 }
 
 const matchesFilters = (item: AbilityField): boolean => {
@@ -115,7 +117,7 @@ const matchesFilters = (item: AbilityField): boolean => {
 };
 
 const matchesParentFilters = (parentItem: any, parentMetaId: string): boolean => {
-	return (!argv.value && parentItem[parentMetaId] === argv.value);
+	return String(parentItem[parentMetaId]) === argv.value;
 };
 
 const totalElements = Object.keys(inputData.custom).length;
@@ -130,11 +132,9 @@ const newCustom = Object.entries(inputData.custom).reduce(
 		if (!filterMatch && argv["lookup-parent"]) {
 			const parentKey = key.slice(-4);
 			const parentMetaId = metaDataDict[argv.id];
-
 			const parentItems = abilityParentData.filter(
-				(parentItem) => parentItem.code === parentKey
+				(parentItem) => parentItem.alias === parentKey
 			);
-			
 			filterMatch = parentItems.some((item) => matchesParentFilters(item, parentMetaId));
 		}
 

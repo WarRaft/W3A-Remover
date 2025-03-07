@@ -2,6 +2,8 @@
 
 This tool allows you to convert `.w3a` files to `.json` and vice versa, as well as remove specific ability data from `.json` files based on various filters.
 
+Parent ability data (ability-data.slk) from patch 1.26a.
+
 ## Installation
 
 ```bash
@@ -34,20 +36,18 @@ npm run convert <input_json> [output_w3a]
 npm run convert war3map.json war3map.w3a
 ```
 
-### To remove ability data by rawcodes
+### To remove ability data by filters
 
 ```bash
-npm run remove <input_json> <output_json> [--rawcodes <rawcode_list>] [--id x] [--type x] [--level x] [--column x] [--value x]
+npm run remove <input_json> <output_json> [--rawcodes <rawcode_list>] [--id x] [--value x] [--lookup-parent]
 ```
 
 #### Filters
 
 - `--rawcodes <rawcode_list>`: Path to the file with rawcodes to filter.
-- `--id <id>`: Filter by id.
-- `--type <type>`: Filter by type.
-- `--level <level>`: Filter by level.
-- `--column <column>`: Filter by column.
+- `--id <id>`: Filter by id. Allowed types see in meta-data-dict.ts.
 - `--value <value>`: Filter by value.
+- `--lookup-parent`: Lookup parent ability if filters do not match (.w3a contains only modified data).
 
 #### Rawcodes File Format
 
