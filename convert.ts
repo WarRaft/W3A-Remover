@@ -2,12 +2,12 @@
 
 import * as fs from 'fs-extra';
 import * as Path from 'path';
-import * as Translator from 'wc3maptranslator'; // Adjust this import if needed
+import * as Translator from 'wc3maptranslator';
 
 function main() {
   const args = process.argv.slice(2);
   if (args.length < 1) {
-    console.error("Usage: ts-node convert.ts <input file> [output file]");
+    console.error("Usage: ts-node convert.ts <input_file> [output_file]");
     process.exit(1);
   }
 
