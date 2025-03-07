@@ -3,8 +3,8 @@
 import * as fs from "fs";
 import { hideBin } from "yargs/helpers";
 import yargs from "yargs";
-import { metaDataDict } from "./meta-data-dict";
-import { SLK } from "./slk";
+import { metaDataDict } from "./src/meta-data-dict";
+import { SLK } from "./src/slk/slk";
 
 interface AbilityField {
 	id?: string;
@@ -105,7 +105,7 @@ if (argv.rawcodes) {
 
 let abilityParentData: any[] = [];
 if (argv["lookup-parent"]) {
-	const slk = new SLK(fs.readFileSync("./ability-data.slk", "utf8"));
+	const slk = new SLK(fs.readFileSync("./src/ability-data.slk", "utf8"));
 	abilityParentData = slk.map;
 }
 
