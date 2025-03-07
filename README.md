@@ -64,8 +64,14 @@ A03K
 
 #### Example
 
-The command below will delete all the abilities that match rawcodes in rawcodes.txt and which belong to the orc race.
+The command below will delete all the abilities that match rawcodes in rawcodes.txt, which belong to the orc race. If an ability doesn't have modified data for race, then it will look for the race in the parent ability.
 
+bash:
 ```bash
-npm run remove war3map.json war3map-filtered.json --rawcodes rawcodes.txt --id arac --value orc
+npm run remove -- war3map.json war3map-filtered.json --rawcodes rawcodes.txt --id arac --value orc --lookup-parent
+```
+
+powershell:
+```bash
+npm run remove -- .\war3map.json .\war3map-removed.json -- --rawcodes rawcodes.txt --id arac --value orc --lookup-parent
 ```

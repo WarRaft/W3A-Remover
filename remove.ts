@@ -4,7 +4,7 @@ import * as fs from "fs";
 import { hideBin } from "yargs/helpers";
 import yargs from "yargs";
 import { metaDataDict } from "./meta-data-dict";
-import * as XLSX from "xlsx";
+import { SLK } from "./slk";
 
 interface AbilityField {
 	id?: string;
@@ -105,8 +105,8 @@ if (argv.rawcodes) {
 
 let abilityParentData: any[] = [];
 if (argv["lookup-parent"]) {
-	const slk = XLSX.readFile("./ability-data.slk");
-	abilityParentData = XLSX.utils.sheet_to_json(slk.Sheets[slk.SheetNames[0]]);
+	const slk = new SLK(fs.readFileSync("./ability-data.slk", "utf8"));
+	abilityParentData = slk.map;
 }
 
 const matchesFilters = (item: AbilityField): boolean => {
