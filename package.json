@@ -5,16 +5,17 @@
     "main": "remover.js",
     "scripts": {
         "convert": "ts-node convert.ts",
-        "remove": "ts-node remover.ts"
-      },
+        "remove": "ts-node remove.ts"
+    },
     "dependencies": {
         "fs-extra": "^10.1.0",
-        "wc3maptranslator": "^4.0.0"
+        "wc3maptranslator": "^4.0.0",
+        "yargs": "^17.7.2"
     },
     "devDependencies": {
         "@types/node": "^18.0.0",
-        "typescript": "^4.9.0",
-        "ts-node": "^10.0.0"
+        "ts-node": "^10.0.0",
+        "typescript": "^4.9.0"
     },
     "license": "MIT"
 }
