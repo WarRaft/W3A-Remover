@@ -21,38 +21,37 @@ interface InputData {
 const argv = yargs(hideBin(process.argv))
   .usage('Usage: npm run remove <input_json> <output_json> [--rawcodes <rawcode_list>] [--id x] [--type x] [--level x] [--column x] [--value x]')
   .option('rawcodes', {
-    alias: 't',
     type: 'string',
-    description: 'Путь к файлу с равкодами для удаления',
+    description: 'Path to the file with rawcodes to filter',
   })
   .option('id', {
     type: 'string',
-    description: 'Фильтр по id',
+    description: 'Filter by id',
   })
   .option('type', {
     type: 'string',
-    description: 'Фильтр по type',
+    description: 'Filter by type',
   })
   .option('level', {
     type: 'number',
-    description: 'Фильтр по level',
+    description: 'Filter by level',
   })
   .option('column', {
     type: 'number',
-    description: 'Фильтр по column',
+    description: 'Filter by column',
   })
   .option('value', {
     type: 'string',
-    description: 'Фильтр по value',
+    description: 'Filter by value',
   })
-  .demandCommand(2, 'Необходимо указать входной и выходной файлы')
+  .demandCommand(2, 'Input and output files are required')
   .help()
   .argv;
 
 const [inputPath, outputPath] = argv._ as string[];
 
 if (argv._.length > 2) {
-  console.error('Ошибка: указано слишком много аргументов');
+  console.error('Error: too many arguments provided');
   process.exit(1);
 }
 
@@ -60,12 +59,12 @@ let inputData: InputData;
 try {
   inputData = JSON.parse(fs.readFileSync(inputPath, 'utf8'));
 } catch (error) {
-  console.error(`Ошибка чтения или парсинга файла ${inputPath}:`, error);
+  console.error(`Error reading or parsing file ${inputPath}:`, error);
   process.exit(1);
 }
 
 if (!inputData.custom || typeof inputData.custom !== 'object') {
-  console.error('Структура JSON не соответствует ожидаемой (отсутствует объект custom)');
+  console.error('The JSON structure does not match the expected format (missing "custom" data)');
   process.exit(1);
 }
 
@@ -77,7 +76,7 @@ if (argv.rawcodes) {
       .map(code => code.trim())
       .filter(Boolean);
   } catch (error) {
-    console.error(`Ошибка чтения файла rawcodes ${argv.rawcodes}:`, error);
+    console.error(`Error reading rawcodes file ${argv.rawcodes}:`, error);
     process.exit(1);
   }
 
@@ -94,7 +93,7 @@ if (argv.rawcodes) {
 
   rawCodes.forEach(code => {
     if (!foundCodes[code]) {
-      console.warn(`Warning: код "${code}" не найден в JSON`);
+      console.warn(`Warning: rawcode "${code}" not found in JSON input file`);
     }
   });
 }
@@ -124,14 +123,14 @@ const deletedCount = totalElements - remainingCount;
 
 inputData.custom = newCustom;
 
-console.log(`Всего элементов: ${totalElements}`);
-console.log(`Удалено элементов: ${deletedCount}`);
-console.log(`Осталось элементов: ${remainingCount}`);
+console.log(`Total elements: ${totalElements}`);
+console.log(`Deleted elements: ${deletedCount}`);
+console.log(`Remaining elements: ${remainingCount}`);
 
 try {
   fs.writeFileSync(outputPath, JSON.stringify(inputData, null, 2), 'utf8');
-  console.log(`Модифицированный JSON сохранён в файле: ${outputPath}`);
+  console.log(`Modified JSON saved to file: ${outputPath}`);
 } catch (error) {
-  console.error(`Ошибка записи файла ${outputPath}:`, error);
+  console.error(`Error writing file ${outputPath}:`, error);
   process.exit(1);
 }
