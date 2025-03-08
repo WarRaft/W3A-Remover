@@ -129,7 +129,11 @@ const newCustom = Object.entries(inputData.custom).reduce(
 			: true;
 		let filterMatch = items.some((item) => matchesFilters(item));
 
-		if (!filterMatch && argv["lookup-parent"]) {
+		if (!filterMatch &&
+			argv["lookup-parent"] &&
+			argv.id &&
+			!items.some((item) => item.id === argv.id)
+		) {
 			const parentKey = key.slice(-4);
 			const parentMetaId = metaDataDict[argv.id];
 			const parentItems = abilityParentData.filter(
